@@ -1,0 +1,9 @@
+{
+  "generator-node": {
+    "promptValues": {
+      "authorName": "Brandon Suen",
+      "authorEmail": "brandonsuenbusiness@gmail.com",
+      "authorUrl": "https://brandons42.github.io/personal_website/"
+    }
+  }
+}

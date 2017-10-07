@@ -1,0 +1,57 @@
+{
+  "name": "generator-init-enhanced",
+  "version": "0.0.0",
+  "description": "An easily composable Yeoman generator for quickly generating a license, README, and package.json that suits your needs",
+  "homepage": "https://github.com/Brandons42/generator-init-enhanced",
+  "author": {
+    "name": "Brandon Suen",
+    "email": "brandonsuenbusiness@gmail.com",
+    "url": "https://brandons42.github.io/personal_website/"
+  },
+  "files": [
+    "generators"
+  ],
+  "main": "generators/index.js",
+  "keywords": [
+    "yeoman",
+    "LICENSE",
+    "README",
+    "README.md",
+    "yarn-init",
+    "npm-init",
+    "package.json",
+    "packagejson",
+    "yeoman-generator"
+  ],
+  "devDependencies": {
+    "yeoman-test": "^1.6.0",
+    "yeoman-assert": "^3.0.0",
+    "nsp": "^2.6.3",
+    "eslint": "^4.1.0",
+    "eslint-config-xo-space": "^0.16.0",
+    "jest": "^19.0.2",
+    "jest-cli": "^20.0.0"
+  },
+  "dependencies": {
+    "yeoman-generator": "^1.0.0",
+    "chalk": "^1.1.3",
+    "yosay": "^2.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "scripts": {
+    "prepublish": "nsp check",
+    "pretest": "eslint . --fix",
+    "test": "jest"
+  },
+  "eslintConfig": {
+    "extends": "xo-space",
+    "env": {
+      "jest": true,
+      "node": true
+    }
+  },
+  "repository": "https://github.com/Brandons42/generator-init-enhanced.git",
+  "private": true
+}
