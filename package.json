@@ -15,6 +15,7 @@
   "main": "generators/index.js",
   "keywords": [
     "yeoman",
+    "generator",
     "LICENSE",
     "README",
     "README.md",
