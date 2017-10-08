@@ -14,10 +14,6 @@ module.exports = class extends Generator {
       hide: true,
       type: String
     });
-    this.option('username', {
-      hide: true,
-      type: String
-    });
     this.option('description', {
       alias: 'desc',
       default: 'An awesome project',
@@ -25,25 +21,30 @@ module.exports = class extends Generator {
       type: String
     });
     this.option('homepage', {
-      alias: 'rp',
+      alias: 'hp',
+      default: '',
       hide: true,
       type: String
     });
     this.option('license', {
       alias: 'lcs',
+      default: 'MIT',
       hide: true,
       type: String
     });
     this.option('author', {
       alias: 'auth',
+      default: '',
       hide: true,
       type: String
     });
     this.option('email', {
+      default: '',
       hide: true,
       type: String
     });
     this.option('url', {
+      default: '',
       hide: true,
       type: String
     });
@@ -126,7 +127,7 @@ module.exports = class extends Generator {
           default: this.options.main,
           message: str + 'entry point?',
           name: 'main',
-          //store: true,
+          store: true,
           type: 'input'
         },
         {
@@ -140,28 +141,28 @@ module.exports = class extends Generator {
           default: this.options.author,
           message: 'What\'s your name?',
           name: 'author',
-          //store: true,
+          store: true,
           type: 'input'
         },
         {
           default: this.options.email,
           message: 'What\'s your email?',
           name: 'email',
-          //store: true,
+          store: true,
           type: 'input'
         },
         {
           default: this.options.url,
           message: 'What\'s the url for your personal website, Github profile, or some page about you?',
           name: 'url',
-          //store: true,
+          store: true,
           type: 'input'
         },
         {
           default: this.options.private,
           message: 'Is your project private?',
           name: 'private',
-          //store: true,
+          store: true,
           type: 'confirm'
         },
         {
@@ -188,13 +189,19 @@ module.exports = class extends Generator {
 
   writing() {
 
-    this.composeWith(require.resolve('generator-license'), {
+    const opts = {
       name: this.options.name,
       email: this.options.email,
-      website: this.options.url,
-      licensePrompt: 'Which license do you want to use?',
-      defaultLicense: this.options.license
-    });
+      website: this.options.url
+    };
+    if (this.options.yes) {
+      opts.license = this.options.license;
+    }
+    else {
+      opts.licensePrompt = 'Which license do you want to use?';
+      opts.defaultLicense = this.options.license;
+    }
+    this.composeWith(require.resolve('generator-license'), opts);
 
     const pkg = {
       'name': this.options.name,
@@ -204,19 +211,19 @@ module.exports = class extends Generator {
       'license': this.options.license,
       'private': this.options.private
     };
-    if (typeof this.options.homepage === 'string' && this.options.homepage.length > 0) {
+    if (this.options.homepage.length > 0) {
       pkg['homepage'] = this.options.homepage;
     }
-    if ((typeof this.options.author === 'string' && this.options.author.length > 0) || (typeof this.options.email === 'string' && this.options.email.length > 0) || (typeof this.options.url === 'string' && this.options.url.length > 0)) {
+    if (this.options.author.length > 0 || this.options.email.length > 0 || this.options.url.length > 0) {
       pkg['author'] = new Object();
     }
-    if (typeof this.options.author === 'string' && this.options.author.length > 0) {
+    if (this.options.author.length > 0) {
       pkg['author']['name'] = this.options.author;
     }
-    if (typeof this.options.email === 'string' && this.options.email.length > 0) {
+    if (this.options.email.length > 0) {
       pkg['author']['email'] = this.options.email;
     }
-    if (typeof this.options.url === 'string' && this.options.url.length > 0) {
+    if (this.options.url.length > 0) {
       pkg['author']['url'] = this.options.url;
     }
     if (typeof this.options.keywords === 'string' && this.options.scripts.length > 0) {
@@ -224,14 +231,10 @@ module.exports = class extends Generator {
       pkg['keywords'] = keywords;
     }
     if (typeof this.options.scripts === 'string' && this.options.scripts.length > 0) {
-      this.log(this.options.scripts);
-      this.log(typeof this.options.scripts);
       pkg['scripts'] = new Object();
       const scripts = this.options.scripts.split(',');
       let command;
       for (let q = 0; q < scripts.length; q++) {
-        this.log(scripts[q]);
-        this.log(scripts[q].split(':'));
         command = scripts[q].split(':');
         if (command[1].startsWith(' ')) {
           command[1] = command[1].substring(1);
