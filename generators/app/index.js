@@ -9,68 +9,78 @@ module.exports = class extends Generator {
 
     super(args, opts);
 
+    this.config.defaults({
+      'name': this.appname,
+      'description': 'An awesome project',
+      'homepage': '',
+      'license': 'MIT',
+      'author': '',
+      'email': '',
+      'url': '',
+      'main': 'index.js',
+      'keywords': '',
+      'scripts': '',
+      'explanation': 'An awesome project that does awesome things!',
+      'private': false
+    });
+
     this.option('name', {
-      default: this.appname,
+      default: this.config.get('name'),
       hide: true,
       type: String
     });
     this.option('description', {
-      alias: 'desc',
-      default: 'An awesome project',
+      default: this.config.get('description'),
       hide: true,
       type: String
     });
     this.option('homepage', {
-      alias: 'hp',
-      default: '',
+      default: this.config.get('homepage'),
       hide: true,
       type: String
     });
     this.option('license', {
-      alias: 'lcs',
-      default: 'MIT',
+      default: this.config.get('license'),
       hide: true,
       type: String
     });
     this.option('author', {
-      alias: 'auth',
-      default: '',
+      default: this.config.get('author'),
       hide: true,
       type: String
     });
     this.option('email', {
-      default: '',
+      default: this.config.get('email'),
       hide: true,
       type: String
     });
     this.option('url', {
-      default: '',
+      default: this.config.get('url'),
       hide: true,
       type: String
     });
     this.option('main', {
-      default: 'index.js',
+      default: this.config.get('main'),
       hide: true,
       type: String
     });
     this.option('keywords', {
+      default: this.config.get('keywords'),
       hide: true,
       type: String
     });
     this.option('scripts', {
-      alias: 's',
+      default: this.config.get('scripts'),
       hide: true,
       type: String
     });
     this.option('explanation', {
-      alias: 'exp',
-      default: 'An awesome project that does awesome things!',
+      default: this.config.get('explanation'),
       hide: true,
       type: String
     });
     this.option('private', {
-      alias: 'priv',
-      default: false,
+      default: this.config.get('private'),
       hide: true,
       type: Boolean
     });
@@ -96,10 +106,9 @@ module.exports = class extends Generator {
 
     if (!this.options.yes) {
 
-      const str = 'What\'s your project\'s ';
-      const plural = 'What are some ';
       const fyp = ' for your project?';
-
+      const plural = 'What are some ';
+      const str = 'What\'s your project\'s ';
 
       return this.prompt([
         {
@@ -136,6 +145,26 @@ module.exports = class extends Generator {
           name: 'homepage',
           store: false,
           type: 'input'
+        },
+        {
+          choices: [
+            'Apache 2.0',
+            'BSD 2-Clause (FreeBSD) License',
+            'BSD 3-Clause (NewBSD) License',
+            'GNU AGPL 3.0',
+            'GNU GPL 3.0',
+            'GNU LGPL 3.0',
+            'Internet Systems Consortium (ISC) License',
+            'MIT',
+            'Mozilla Public License 2.0',
+            'No License (Copyrighted)',
+            'Unlicense'
+          ],
+          default: this.options.license,
+          message: 'Which license would you like to use?',
+          name: 'license',
+          store: true,
+          type: 'list'
         },
         {
           default: this.options.author,
@@ -189,48 +218,65 @@ module.exports = class extends Generator {
 
   writing() {
 
+    const licenses = {
+      'Apache 2.0': 'Apache-2.0',
+      'MIT': 'MIT',
+      'Mozilla Public License 2.0': 'MPL-2.0',
+      'BSD 2-Clause (FreeBSD) License': 'BSD-2-Clause-FreeBSD',
+      'BSD 3-Clause (NewBSD) License': 'BSD-3-Clause',
+      'Internet Systems Consortium (ISC) License': 'ISC',
+      'GNU AGPL 3.0': 'AGPL-3.0',
+      'GNU GPL 3.0': 'GPL-3.0',
+      'GNU LGPL 3.0': 'LGPL-3.0',
+      'Unlicense': 'unlicense',
+      'No License (Copyrighted)': 'nolicense'
+    };
     const opts = {
       name: this.options.name,
       email: this.options.email,
-      website: this.options.url
+      website: this.options.url,
+      license: licenses[this.options.license]
     };
-    if (this.options.yes) {
-      opts.license = this.options.license;
-    }
-    else {
-      opts.licensePrompt = 'Which license do you want to use?';
-      opts.defaultLicense = this.options.license;
-    }
     this.composeWith(require.resolve('generator-license'), opts);
-
-    const pkg = {
+    this.config.set({'name': this.options.name});
+    const one = {
       'name': this.options.name,
-      'version': '0.0.0',
+      'version': '0.0.0'
+    };
+    const two = {
       'description': this.options.description,
       'main': this.options.main,
       'license': this.options.license,
       'private': this.options.private
     };
+    this.config.set(two);
+    const pkg = Object.assign(one, two);
     if (this.options.homepage.length > 0) {
       pkg['homepage'] = this.options.homepage;
+      this.config.set({'homepage': this.options.homepage});
     }
     if (this.options.author.length > 0 || this.options.email.length > 0 || this.options.url.length > 0) {
       pkg['author'] = new Object();
     }
     if (this.options.author.length > 0) {
       pkg['author']['name'] = this.options.author;
+      this.config.set({'author': this.options.author});
     }
     if (this.options.email.length > 0) {
       pkg['author']['email'] = this.options.email;
+      this.config.set({'email': this.options.email});
     }
     if (this.options.url.length > 0) {
       pkg['author']['url'] = this.options.url;
+      this.config.set({'url': this.options.url});
     }
-    if (typeof this.options.keywords === 'string' && this.options.scripts.length > 0) {
+    if (this.options.scripts.length > 0) {
       const keywords = this.options.keywords.replace(/ /g, '').split(',');
       pkg['keywords'] = keywords;
+      this.config.set({'keywords': keywords});
     }
-    if (typeof this.options.scripts === 'string' && this.options.scripts.length > 0) {
+    if (this.options.scripts.length > 0) {
+      this.config.set({'scripts': this.options.scripts});
       pkg['scripts'] = new Object();
       const scripts = this.options.scripts.split(',');
       let command;
@@ -243,6 +289,7 @@ module.exports = class extends Generator {
       }
     }
     this.fs.writeJSON('./package.json', pkg);
+    this.config.set({'explanation': this.options.explanation});
 
   }
 
