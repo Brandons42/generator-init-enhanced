@@ -1,6 +1,6 @@
 {
   "name": "generator-init-enhanced",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "An easily composable Yeoman generator for quickly generating a license, README, and package.json that suits your needs",
   "license": "MIT",
   "homepage": "https://github.com/Brandons42/generator-init-enhanced",
