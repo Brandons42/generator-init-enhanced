@@ -21,6 +21,7 @@
     "README.md",
     "yarn-init",
     "npm-init",
+    "init",
     "package.json",
     "packagejson",
     "yeoman-generator"

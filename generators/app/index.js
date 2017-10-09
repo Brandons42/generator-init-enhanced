@@ -11,17 +11,14 @@ module.exports = class extends Generator {
 
     this.config.defaults({
       'name': this.appname,
-      'description': 'An awesome project',
-      'homepage': '',
       'license': 'MIT',
       'author': '',
       'email': '',
       'url': '',
       'main': 'index.js',
-      'keywords': '',
       'scripts': '',
-      'explanation': 'An awesome project that does awesome things!',
-      'private': false
+      'private': false,
+      'username': ''
     });
 
     this.option('name', {
@@ -30,12 +27,12 @@ module.exports = class extends Generator {
       type: String
     });
     this.option('description', {
-      default: this.config.get('description'),
+      default: 'An awesome project',
       hide: true,
       type: String
     });
     this.option('homepage', {
-      default: this.config.get('homepage'),
+      default: '',
       hide: true,
       type: String
     });
@@ -65,7 +62,7 @@ module.exports = class extends Generator {
       type: String
     });
     this.option('keywords', {
-      default: this.config.get('keywords'),
+      default: '',
       hide: true,
       type: String
     });
@@ -75,7 +72,7 @@ module.exports = class extends Generator {
       type: String
     });
     this.option('explanation', {
-      default: this.config.get('explanation'),
+      default: this.options.name + ' is an awesome project that does awesome things.',
       hide: true,
       type: String
     });
@@ -83,6 +80,11 @@ module.exports = class extends Generator {
       default: this.config.get('private'),
       hide: true,
       type: Boolean
+    });
+    this.option('username', {
+      default: this.config.get('username'),
+      hide: true,
+      type: String
     });
     this.option('yes', {
       alias: 'y',
@@ -207,6 +209,12 @@ module.exports = class extends Generator {
           name: 'scripts',
           store: false,
           type: 'input'
+        }, {
+          default: this.options.username,
+          message: 'What\'s your Github username?',
+          name: 'username',
+          store: true,
+          type: 'input'
         }
       ]).then(options => {
         this.options = options;
@@ -239,21 +247,19 @@ module.exports = class extends Generator {
     };
     this.composeWith(require.resolve('generator-license'), opts);
     this.config.set({'name': this.options.name});
-    const one = {
+    const pkg = {
       'name': this.options.name,
-      'version': '0.0.0'
-    };
-    const two = {
+      'version': '0.0.0',
       'description': this.options.description,
       'main': this.options.main,
       'license': this.options.license,
       'private': this.options.private
     };
-    this.config.set(two);
-    const pkg = Object.assign(one, two);
+    this.config.set({'main': this.options.main});
+    this.config.set({'license': this.options.license});
+    this.config.set({'private': this.options.private});
     if (this.options.homepage.length > 0) {
       pkg['homepage'] = this.options.homepage;
-      this.config.set({'homepage': this.options.homepage});
     }
     if (this.options.author.length > 0 || this.options.email.length > 0 || this.options.url.length > 0) {
       pkg['author'] = new Object();
@@ -273,7 +279,6 @@ module.exports = class extends Generator {
     if (this.options.scripts.length > 0) {
       const keywords = this.options.keywords.replace(/ /g, '').split(',');
       pkg['keywords'] = keywords;
-      this.config.set({'keywords': keywords});
     }
     if (this.options.scripts.length > 0) {
       this.config.set({'scripts': this.options.scripts});
@@ -289,7 +294,18 @@ module.exports = class extends Generator {
       }
     }
     this.fs.writeJSON('./package.json', pkg);
-    this.config.set({'explanation': this.options.explanation});
+    this.config.set({'username': this.options.username});
+    this.fs.copyTpl(
+      this.templatePath('README.md'),
+      this.destinationPath('./README.md'), {
+        name: this.options.name,
+        desc: this.options.description,
+        exp: this.options.explanation,
+        auth: this.options.author,
+        url: this.options.url,
+        uname: this.options.username
+      }
+    );
 
   }
 
