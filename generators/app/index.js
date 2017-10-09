@@ -86,6 +86,11 @@ module.exports = class extends Generator {
       hide: true,
       type: String
     });
+    this.option('prompt', {
+      default: '',
+      hide: true,
+      type: String
+    });
     this.option('yes', {
       alias: 'y',
       default: false,
@@ -93,6 +98,66 @@ module.exports = class extends Generator {
       hide: false,
       type: Boolean
     });
+    let prompts;
+    if (this.options.prompt.startsWith('x')) {
+      prompts = this.options.prompt.substring(1).replace(/ /g, '').split(',');
+      this.toPrompt = {
+        'name': true,
+        'description': true,
+        'explanation': true,
+        'main': true,
+        'homepage': true,
+        'license': true,
+        'author': true,
+        'email': true,
+        'url': true,
+        'private': true,
+        'keywords': true,
+        'scripts': true,
+        'username': true
+      };
+      for (let q = 0; q < prompts.length; q++) {
+        this.toPrompt[prompts[q]] = false;
+      }
+    }
+    else if (this.options.prompt.length > 0) {
+      prompts = this.options.prompt.replace(/ /g, '').split(',');
+      this.toPrompt = {
+        'name': false,
+        'description': false,
+        'explanation': false,
+        'main': false,
+        'homepage': false,
+        'license': false,
+        'author': false,
+        'email': false,
+        'url': false,
+        'private': false,
+        'keywords': false,
+        'scripts': false,
+        'username': false
+      };
+      for (let q = 0; q < prompts.length; q++) {
+        this.toPrompt[prompts[q]] = true;
+      }
+    }
+    else {
+      this.toPrompt = {
+        'name': true,
+        'description': true,
+        'explanation': true,
+        'main': true,
+        'homepage': true,
+        'license': true,
+        'author': true,
+        'email': true,
+        'url': true,
+        'private': true,
+        'keywords': true,
+        'scripts': true,
+        'username': true
+      };
+    }
 
   }
 
@@ -118,35 +183,40 @@ module.exports = class extends Generator {
           message: str + 'name?',
           name: 'name',
           store: false,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['name']
         },
         {
           default: this.options.description,
           message: 'Give a brief and to the point description of your project',
           name: 'description',
           store: false,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['description']
         },
         {
           default: this.options.explanation,
           message: 'Now, give a slightly longer and more detailed description',
           name: 'explanation',
           store: false,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['explanation']
         },
         {
           default: this.options.main,
           message: str + 'entry point?',
           name: 'main',
           store: true,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['main']
         },
         {
           default: this.options.homepage,
           message: 'What\'s the url of your project\'s homepage?',
           name: 'homepage',
           store: false,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['homepage']
         },
         {
           choices: [
@@ -166,58 +236,66 @@ module.exports = class extends Generator {
           message: 'Which license would you like to use?',
           name: 'license',
           store: true,
-          type: 'list'
+          type: 'list',
+          when: this.toPrompt['license']
         },
         {
           default: this.options.author,
           message: 'What\'s your name?',
           name: 'author',
           store: true,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['author']
         },
         {
           default: this.options.email,
           message: 'What\'s your email?',
           name: 'email',
           store: true,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['email']
         },
         {
           default: this.options.url,
           message: 'What\'s the url for your personal website, Github profile, or some page about you?',
           name: 'url',
           store: true,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['url']
         },
         {
           default: this.options.private,
           message: 'Is your project private?',
           name: 'private',
           store: true,
-          type: 'confirm'
+          type: 'confirm',
+          when: this.toPrompt['private']
         },
         {
           default: this.options.keywords,
           message: plural + 'keywords' + fyp + '(Example: keyword1, keyword2)',
           name: 'keywords',
           store: false,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['keywords']
         },
         {
           default: this.options.scripts,
           message: plural + 'scripts' + fyp + '(Example: commands: command1 && comand2, execute: execution1 && execution2)',
           name: 'scripts',
           store: false,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['scripts']
         }, {
           default: this.options.username,
           message: 'What\'s your Github username?',
           name: 'username',
           store: true,
-          type: 'input'
+          type: 'input',
+          when: this.toPrompt['username']
         }
-      ]).then(options => {
-        this.options = options;
+      ]).then(answers => {
+        this.answers = answers;
       });
 
     }
@@ -239,54 +317,85 @@ module.exports = class extends Generator {
       'Unlicense': 'unlicense',
       'No License (Copyrighted)': 'nolicense'
     };
+    let name, email, url, license, main, description, priv, homepage, author, keywords, scripts, username, explanation;
+    if (this.options.yes) {
+      name = this.options.name;
+      email = this.options.email;
+      url = this.options.url;
+      license = this.options.license;
+      main = this.options.main;
+      description = this.options.description;
+      priv = this.options.private;
+      homepage = this.options.homepage;
+      author = this.options.author;
+      keywords = this.options.keywords;
+      scripts = this.options.scripts;
+      username = this.options.username;
+      explanation = this.options.explanation;
+    }
+    else {
+      name = this.toPrompt['name'] ? this.answers.name : this.options.name;
+      email = this.toPrompt['email'] ? this.answers.email : this.options.email;
+      url = this.toPrompt['url'] ? this.answers.url : this.options.url;
+      license = this.toPrompt['license'] ? this.answers.license : this.options.license;
+      main = this.toPrompt['main'] ? this.answers.main : this.options.main;
+      description = this.toPrompt['description'] ? this.answers.description : this.options.description;
+      priv = this.toPrompt['private'] ? this.answers.private : this.options.private;
+      homepage = this.toPrompt['homepage'] ? this.answers.homepage : this.options.homepage;
+      author = this.toPrompt['author'] ? this.answers.author : this.options.author;
+      keywords = this.toPrompt['keywords'] ? this.answers.keywords : this.options.keywords;
+      scripts = this.toPrompt['scripts'] ? this.answers.scripts : this.options.scripts;
+      username = this.toPrompt['username'] ? this.answers.username : this.options.username;
+      explanation = this.toPrompt['explanation'] ? this.answers.explanation : this.options.explanation;
+    }
     const opts = {
-      name: this.options.name,
-      email: this.options.email,
-      website: this.options.url,
-      license: licenses[this.options.license]
+      name: name,
+      email: email,
+      website: url,
+      license: licenses[license]
     };
     this.composeWith(require.resolve('generator-license'), opts);
-    this.config.set({'name': this.options.name});
+    this.config.set({'name': name});
     const pkg = {
-      'name': this.options.name,
+      'name': name,
       'version': '0.0.0',
-      'description': this.options.description,
-      'main': this.options.main,
-      'license': this.options.license,
-      'private': this.options.private
+      'description': description,
+      'main': main,
+      'license': license,
+      'private': priv
     };
-    this.config.set({'main': this.options.main});
-    this.config.set({'license': this.options.license});
-    this.config.set({'private': this.options.private});
-    if (this.options.homepage.length > 0) {
-      pkg['homepage'] = this.options.homepage;
+    this.config.set({'main': main});
+    this.config.set({'license': license});
+    this.config.set({'private': priv});
+    if (homepage.length > 0) {
+      pkg['homepage'] = homepage;
     }
-    if (this.options.author.length > 0 || this.options.email.length > 0 || this.options.url.length > 0) {
+    if (author.length > 0 || email.length > 0 || url.length > 0) {
       pkg['author'] = new Object();
     }
-    if (this.options.author.length > 0) {
-      pkg['author']['name'] = this.options.author;
-      this.config.set({'author': this.options.author});
+    if (author.length > 0) {
+      pkg['author']['name'] = author;
+      this.config.set({'author': author});
     }
-    if (this.options.email.length > 0) {
-      pkg['author']['email'] = this.options.email;
-      this.config.set({'email': this.options.email});
+    if (email.length > 0) {
+      pkg['author']['email'] = email;
+      this.config.set({'email': email});
     }
-    if (this.options.url.length > 0) {
-      pkg['author']['url'] = this.options.url;
-      this.config.set({'url': this.options.url});
+    if (url.length > 0) {
+      pkg['author']['url'] = url;
+      this.config.set({'url': url});
     }
-    if (this.options.scripts.length > 0) {
-      const keywords = this.options.keywords.replace(/ /g, '').split(',');
-      pkg['keywords'] = keywords;
+    if (keywords.length > 0) {
+      const keywordArr = keywords.replace(/ /g, '').split(',');
+      pkg['keywords'] = keywordArr;
     }
-    if (this.options.scripts.length > 0) {
-      this.config.set({'scripts': this.options.scripts});
+    if (scripts.length > 0) {
+      this.config.set({'scripts': scripts});
       pkg['scripts'] = new Object();
-      const scripts = this.options.scripts.split(',');
+      const scriptArr = scripts.split(',');
       let command;
-      for (let q = 0; q < scripts.length; q++) {
-        command = scripts[q].split(':');
+      for (let q = 0; q < scriptArr.length; q++) {
+        command = scriptArr[q].split(':');
         if (command[1].startsWith(' ')) {
           command[1] = command[1].substring(1);
         }
@@ -294,16 +403,16 @@ module.exports = class extends Generator {
       }
     }
     this.fs.writeJSON('./package.json', pkg);
-    this.config.set({'username': this.options.username});
+    this.config.set({'username': username});
     this.fs.copyTpl(
       this.templatePath('README.md'),
       this.destinationPath('./README.md'), {
-        name: this.options.name,
-        desc: this.options.description,
-        exp: this.options.explanation,
-        auth: this.options.author,
-        url: this.options.url,
-        uname: this.options.username
+        name: name,
+        desc: description,
+        exp: explanation,
+        auth: author,
+        url: url,
+        uname: username
       }
     );
 
