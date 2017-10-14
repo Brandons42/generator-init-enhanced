@@ -90,9 +90,9 @@ Licenses you can choose
 
 ## License
 
- © [Brandon Suen](https://brandons42.github.io/personal_website/)
+ © Brandon Suen
 
-
+[Brandon Suen](https://brandons42.github.io/personal_website/)
 [npm-image]: https://badge.fury.io/js/generator-init-enhanced.svg
 [npm-url]: https://npmjs.org/package/generator-init-enhanced
 [travis-image]: https://travis-ci.org/brandons42/generator-init-enhanced.svg?branch=master
